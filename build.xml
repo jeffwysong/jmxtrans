@@ -130,6 +130,7 @@
 			<fileset dir="src" defaultexcludes="yes">
 				<include name="**/*.xml"/>
 				<include name="**/*.properties"/>
+                <include name="**/coppperegg_config.json"/>
 			</fileset>
 		</sync>
 		<jar destfile="${build.jar.file}" basedir="${build.classes.dir}">
