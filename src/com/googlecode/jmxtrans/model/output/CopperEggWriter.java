@@ -146,8 +146,8 @@ public class CopperEggWriter extends BaseOutputWriter {
     public void start() throws LifecycleException {
         config_location = DEFAULT_COPPEREGG_CONFIGURATION_PATH;
         String path = config_location.substring("classpath:".length());
-        logger.error("Config_location: {} and classpath.length() {}", config_location, "classpath:".length());
-        logger.error("Path : {}", path);
+//        logger.debug("Config_location: {} and classpath.length() {}", config_location, "classpath:".length());
+//        logger.debug("Path : {}", path);
 
         long thisPID = getPID();
         if( myPID == thisPID) {
@@ -161,7 +161,7 @@ public class CopperEggWriter extends BaseOutputWriter {
             url = new URL(url_str);
             user = getStringSetting(SETTING_USERNAME);
             token = getStringSetting(SETTING_TOKEN);
-            logger.error("token is {}", token);
+//            logger.debug("token is {}", token);
             user = token;
             basicAuthentication = Base64Variants.getDefaultVariant().encode((user + ":" + "U").getBytes(Charset.forName("US-ASCII")));
 
@@ -177,26 +177,10 @@ public class CopperEggWriter extends BaseOutputWriter {
             myPID_host = myhost + '.' + str;
 
             try{
-                Enumeration<URL> e = Thread.currentThread().getContextClassLoader().getResources("");
-                while (e.hasMoreElements())
-                {
-                    logger.error("ClassLoader Resource: " + e.nextElement());
-                }
-                logger.error("Class Resource: " + CopperEggWriter.class.getResource("/"));
-
-
                 InputStream in = Thread.currentThread().getContextClassLoader().getResourceAsStream(path);
                 if(in == null) {
                     logger.warn("No file found for " + path);
-                    in = Thread.currentThread().getContextClassLoader().getResourceAsStream("classpath:copperegg_config.json");
-                    if (in == null) {
-                        logger.warn("No file found for classpath:copperegg_config.json either.");
-                    } else {
-                        logger.error("FILE WAS FOUND!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!########################");
-                        read_config(in);
-                    }
                 } else {
-                    logger.error("FILE WAS FOUND!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
                     read_config(in);
                 }
             } catch (Exception e){
@@ -206,8 +190,7 @@ public class CopperEggWriter extends BaseOutputWriter {
 
             ensure_metric_groups();
             ensure_dashboards();
-
-
+/*
             logger.info("jvm_os_groupID : {}", jvm_os_groupID);
             logger.info("jvm_gc_groupID : {}", jvm_gc_groupID);
             logger.info("jvm_runtime_groupID : {}", jvm_runtime_groupID);
@@ -224,9 +207,7 @@ public class CopperEggWriter extends BaseOutputWriter {
             logger.info("app_groupID : {}", app_groupID );
             logger.info("app_sales_groupID : {}", app_sales_groupID );
             logger.info("cassandra_groupID : {}", cassandra_groupID );
-
-
-
+*/
             //logger.info("Started CopperEggWriter Successfully on jvm '{}', connected to '{}', proxy {}", myPID_host, url, proxy);
         } catch (MalformedURLException e) {
             exceptionCounter.incrementAndGet();
@@ -274,32 +255,26 @@ public class CopperEggWriter extends BaseOutputWriter {
             tmp = String.valueOf(thisPID);
             pidHost = source + "." + tmp;
 
-            logger.error("epochInMillis : {}", epochInMillis);
-            logger.error("myname : {}", myname);
-            logger.error("myval : {}", myval);
-            logger.error("valstr : {}", valstr);
-            logger.error("thisPID : {}", thisPID);
-            logger.error("tmp : {}", tmp);
-            logger.error("pidHost : {}", pidHost);
-            logger.error("ClassNameAlias : {}", result.getClassNameAlias());
-
-
-
-
-
+//            logger.debug("epochInMillis : {}", epochInMillis);
+//            logger.debug("myname : {}", myname);
+//            logger.debug("myval : {}", myval);
+//            logger.debug("valstr : {}", valstr);
+//            logger.debug("thisPID : {}", thisPID);
+//            logger.debug("tmp : {}", tmp);
+//            logger.debug("pidHost : {}", pidHost);
+//            logger.debug("ClassNameAlias : {}", result.getClassNameAlias());
 
             String[] parts = myname.split(delims);
-            logger.error("parts.length : {}", parts.length);
+//            logger.debug("parts.length : {}", parts.length);
             if( parts.length > 0 ) {
                 String p1 = parts[0];
-                logger.warn("p1 : {}", p1);
+//                logger.debug("p1 : {}", p1);
                 if( (jmxtrans_metric_groupID != null) && (p1.equals("jmxtrans")) )  {
                     Result new_result = new Result(myname);
                     new_result.setQuery(query);
                     new_result.setTypeName(pidHost);
                     new_result.addValue(myname, myval);
                     new_result.setEpoch(epochInMillis);
-//                    QueryResult new_result = new QueryResult(myname, pidHost, myval, epochInMillis);
                     jmxtrans_counters.add(new_result);
                 } else if( p1.equals("jvm") ) {
                     if( parts[1].equals("os")) {
@@ -309,7 +284,6 @@ public class CopperEggWriter extends BaseOutputWriter {
                             new_result.setTypeName(pidHost);
                             new_result.addValue(myname, myval);
                             new_result.setEpoch(epochInMillis);
-//                            QueryResult new_result = new QueryResult(myname, pidHost, myval, epochInMillis);
                             jvm_os_counters.add(new_result);
                         } else if (parts[2].equals("CommittedVirtualMemorySize")){
                             float fval = Float.parseFloat(valstr);
@@ -324,7 +298,6 @@ public class CopperEggWriter extends BaseOutputWriter {
                             new_result.setTypeName(pidHost);
                             new_result.addValue(myname, fval);
                             new_result.setEpoch(epochInMillis);
-//                            QueryResult new_result = new QueryResult(myname, pidHost, fval, epochInMillis);
                             jvm_os_counters.add(new_result);
                         } else if (parts[2].equals("ProcessCpuTime")) {
                             float fval = Float.parseFloat(valstr);
@@ -339,7 +312,6 @@ public class CopperEggWriter extends BaseOutputWriter {
                             new_result.setTypeName(pidHost);
                             new_result.addValue(myname, fval);
                             new_result.setEpoch(epochInMillis);
-//                            QueryResult new_result = new QueryResult(myname, pidHost, fval, epochInMillis);
                             jvm_os_counters.add(new_result);
                         }
                     } else if( (parts[1].equals("runtime")) && (parts[2].equals("Uptime")) ) {
@@ -355,7 +327,6 @@ public class CopperEggWriter extends BaseOutputWriter {
                         new_result.setTypeName(pidHost);
                         new_result.addValue(myname, fval);
                         new_result.setEpoch(epochInMillis);
-//                        QueryResult new_result = new QueryResult(myname, pidHost, fval, epochInMillis);
                         jvm_runtime_counters.add(new_result);
                     } else if( (parts[1].equals("loadedClasses")) && (parts[2].equals("LoadedClassCount")) ) {
                         // jvm.loadedClasses.LoadedClassCount 5099 1374549969
@@ -364,7 +335,6 @@ public class CopperEggWriter extends BaseOutputWriter {
                         new_result.setTypeName(pidHost);
                         new_result.addValue(myname, myval);
                         new_result.setEpoch(epochInMillis);
-//                        QueryResult new_result = new QueryResult(myname, pidHost, myval, epochInMillis);
                         jvm_class_counters.add(new_result);
                     } else if( (parts[1].equals("thread")) && (parts[2].equals("ThreadCount")) ){
                         // jvm.thread.ThreadCount 13 1374549940
@@ -373,7 +343,6 @@ public class CopperEggWriter extends BaseOutputWriter {
                         new_result.setTypeName(pidHost);
                         new_result.addValue(myname, myval);
                         new_result.setEpoch(epochInMillis);
-//                        QueryResult new_result = new QueryResult(myname, pidHost, myval, epochInMillis);
                         jvm_thread_counters.add(new_result);
                     } else if( (parts[1].equals("gc")) &&
                             ( (parts[2].equals("Copy")) ||  (parts[2].equals("MarkSweepCompact")) ) &&
@@ -384,7 +353,6 @@ public class CopperEggWriter extends BaseOutputWriter {
                         new_result.setTypeName(pidHost);
                         new_result.addValue(myname, myval);
                         new_result.setEpoch(epochInMillis);
-//                        QueryResult new_result = new QueryResult(myname, pidHost, myval, epochInMillis);
                         jvm_gc_counters.add(new_result);
                     } else if( parts[1].equals("memorypool") ){
                         if( ( (parts[2].equals("Perm_Gen")) || (parts[2].equals("Code_Cache")) ) &&
@@ -403,7 +371,6 @@ public class CopperEggWriter extends BaseOutputWriter {
                             new_result.setTypeName(fullID);
                             new_result.addValue(myname, fval);
                             new_result.setEpoch(epochInMillis);
-//                            QueryResult new_result = new QueryResult(myname, fullID, fval, epochInMillis);
                             nonheap_counters.add(new_result);
                         } else if( ( (parts[2].equals("Eden_Space")) ||
                                 (parts[2].equals("Survivor_Space")) ||
@@ -423,7 +390,6 @@ public class CopperEggWriter extends BaseOutputWriter {
                             new_result.setTypeName(fullID);
                             new_result.addValue(myname, fval);
                             new_result.setEpoch(epochInMillis);
-//                            QueryResult new_result = new QueryResult(myname, fullID, fval, epochInMillis);
                             heap_counters.add(new_result);
                         }
                     }
@@ -439,7 +405,6 @@ public class CopperEggWriter extends BaseOutputWriter {
                         new_result.setTypeName(fullID);
                         new_result.addValue(myname, myval);
                         new_result.setEpoch(epochInMillis);
-//                        QueryResult new_result = new QueryResult(myname, fullID, myval, epochInMillis);
                         tomcat_thread_pool_counters.add(new_result);
                     } else if( (parts[1].equals("global-request-processor")) ) {
                         // tomcat.global-request-processor.http-bio-8080.bytesSent
@@ -459,7 +424,6 @@ public class CopperEggWriter extends BaseOutputWriter {
                             new_result.setTypeName(fullID);
                             new_result.addValue(myname, fval);
                             new_result.setEpoch(epochInMillis);
-//                            QueryResult new_result = new QueryResult(myname, fullID, fval, epochInMillis);
                             tomcat_grp_counters.add(new_result);
                         } else {
                             Result new_result = new Result(myname);
@@ -467,7 +431,6 @@ public class CopperEggWriter extends BaseOutputWriter {
                             new_result.setTypeName(fullID);
                             new_result.addValue(myname, myval);
                             new_result.setEpoch(epochInMillis);
-//                            QueryResult new_result = new QueryResult(myname, fullID, myval, epochInMillis);
                             tomcat_grp_counters.add(new_result);
                         }
                     } else if( (parts[1].equals("manager"))  && (parts[4].equals("activeSessions")) ){
@@ -481,7 +444,6 @@ public class CopperEggWriter extends BaseOutputWriter {
                         new_result.setTypeName(fullID);
                         new_result.addValue(myname, myval);
                         new_result.setEpoch(epochInMillis);
-//                        QueryResult new_result = new QueryResult(myname, fullID, myval, epochInMillis);
                         tomcat_manager_counters.add(new_result);
                     } else if( (parts[1].equals("servlet")) &&
                             ( (parts[4].equals("processingTime")) ||
@@ -497,7 +459,6 @@ public class CopperEggWriter extends BaseOutputWriter {
                         new_result.setTypeName(fullID);
                         new_result.addValue(myname, myval);
                         new_result.setEpoch(epochInMillis);
-//                        QueryResult new_result = new QueryResult(myname, fullID, myval, epochInMillis);
                         tomcat_servlet_counters.add(new_result);
                     } else if( (tomcat_db_groupID != null) && (parts[1].equals("data-source")) ) {
                         String myhost = parts[2];
@@ -510,7 +471,6 @@ public class CopperEggWriter extends BaseOutputWriter {
                         new_result.setTypeName(fullID);
                         new_result.addValue(myname, myval);
                         new_result.setEpoch(epochInMillis);
-//                        QueryResult new_result = new QueryResult(myname, fullID, myval, epochInMillis);
                         tomcat_db_counters.add(new_result);
                     }
                 } else if( (app_groupID != null) && (p1.equals("cocktail")) ) {
@@ -520,7 +480,6 @@ public class CopperEggWriter extends BaseOutputWriter {
                         new_result.setTypeName(pidHost);
                         new_result.addValue(myname, myval);
                         new_result.setEpoch(epochInMillis);
-//                        QueryResult new_result = new QueryResult(myname, pidHost, myval, epochInMillis);
                         app_counters.add(new_result);
                     }
                 } else if( ( (app_sales_groupID != null) && (p1.equals("sales")) ) &&
@@ -532,39 +491,38 @@ public class CopperEggWriter extends BaseOutputWriter {
                     new_result.setTypeName(pidHost);
                     new_result.addValue(myname, myval);
                     new_result.setEpoch(epochInMillis);
-//                    QueryResult new_result = new QueryResult(myname, pidHost, myval, epochInMillis);
                     app_sales_counters.add(new_result);
                 } else {
-                    logger.warn("epochInMillis : {}", epochInMillis);
-                    logger.warn("myname : {}", myname);
-                    logger.warn("myval : {}", myval);
-                    logger.warn("valstr : {}", valstr);
-                    logger.warn("thisPID : {}", thisPID);
-                    logger.warn("pidHost : {}", pidHost);
+//                    logger.debug("epochInMillis : {}", epochInMillis);
+//                    logger.debug("myname : {}", myname);
+//                    logger.debug("myval : {}", myval);
+//                    logger.debug("valstr : {}", valstr);
+//                    logger.debug("thisPID : {}", thisPID);
+//                    logger.debug("pidHost : {}", pidHost);
                     Result new_result = new Result(myname);
                     new_result.setQuery(query);
                     new_result.setTypeName(pidHost);
                     String[] resultParts = valstr.substring(1, valstr.length()-1).split("=");
-                    logger.warn("resultParts[0] : {} and resultParts[1] : {}", resultParts[0], resultParts[1]);
+//                    logger.debug("resultParts[0] : {} and resultParts[1] : {}", resultParts[0], resultParts[1]);
                     StringBuilder keyNameBuilder = new StringBuilder();
                     keyNameBuilder.append(result.getClassNameAlias());
                     keyNameBuilder.append(".");
                     keyNameBuilder.append(resultParts[0]);
                     if (resultParts[0].contains("Size")) {
                         new_result.addValue(keyNameBuilder.toString(), Long.valueOf(resultParts[1]));
-//                        logger.error("################################################");
-//                        logger.error("{\"type\":\"ce_gauge\", \"name\":\"" + keyNameBuilder.toString() + "\", \"unit\":\"bytes\"}");
-//                        logger.error("################################################");
+//                        logger.debug("################################################");
+//                        logger.debug("{\"type\":\"ce_gauge\", \"name\":\"" + keyNameBuilder.toString() + "\", \"unit\":\"bytes\"}");
+//                        logger.debug("################################################");
                     } else if (resultParts[0].equals("Load")) {
                         new_result.addValue(keyNameBuilder.toString(), Float.valueOf(resultParts[1]));
-//                        logger.error("################################################");
-//                        logger.error("{\"type\":\"ce_gauge\", \"name\":\"" + keyNameBuilder.toString() + "\"}");
-//                        logger.error("################################################");
+//                        logger.debug("################################################");
+//                        logger.debug("{\"type\":\"ce_gauge\", \"name\":\"" + keyNameBuilder.toString() + "\"}");
+//                        logger.debug("################################################");
                     } else {
                         new_result.addValue(keyNameBuilder.toString(), Integer.valueOf(resultParts[1]));
-//                        logger.error("################################################");
-//                        logger.error("{\"type\":\"ce_counter\", \"name\":\"" + keyNameBuilder.toString() + "\"}");
-//                        logger.error("################################################");
+//                        logger.debug("################################################");
+//                        logger.debug("{\"type\":\"ce_counter\", \"name\":\"" + keyNameBuilder.toString() + "\"}");
+//                        logger.debug("################################################");
                     }
                     new_result.setEpoch(epochInMillis);
                     cassandra_counters.add(new_result);
@@ -619,32 +577,35 @@ public class CopperEggWriter extends BaseOutputWriter {
             sort_n_send(app_sales_groupID, app_sales_counters);
         }
         if (cassandra_counters.size() > 0) {
-            logger.warn("SENDING SMUT TO SORT N SEND!!!");
+//            logger.debug("SENDING SMUT TO SORT N SEND!!!");
             sort_n_send(cassandra_groupID, cassandra_counters);
         }
     }
 
     @Override
     public void validateSetup(Query query) throws ValidationException {
-        logger.error("*****  VALIDATE_SETUP  *****");
-        counter.incrementAndGet();
-        logger.info("counter is {}", counter.get());
-        logger.info("jvm_os_groupID : {}", jvm_os_groupID);
-        logger.info("jvm_gc_groupID : {}", jvm_gc_groupID);
-        logger.info("jvm_runtime_groupID : {}", jvm_runtime_groupID);
-        logger.info("jvm_class_groupID : {}", jvm_class_groupID);
-        logger.info("jvm_thread_groupID : {}", jvm_thread_groupID);
-        logger.info("heap_metric_groupID : {}", heap_metric_groupID);
-        logger.info("nonheap_metric_groupID : {}", nonheap_metric_groupID );
-        logger.info("tomcat_thread_pool_groupID : {}",tomcat_thread_pool_groupID);
-        logger.info("tomcat_grp_groupID : {}",tomcat_grp_groupID);
-        logger.info("tomcat_servlet_groupID : {}", tomcat_servlet_groupID );
-        logger.info("tomcat_manager_groupID : {}",tomcat_manager_groupID );
-        logger.info("tomcat_db_groupID  : {}", tomcat_db_groupID);
-        logger.info("jmxtrans_metric_groupID : {}", jmxtrans_metric_groupID);
-        logger.info("app_groupID : {}", app_groupID );
-        logger.info("app_sales_groupID : {}", app_sales_groupID );
-        logger.info("cassandra_groupID : {}", cassandra_groupID );
+//        logger.debug("*****  VALIDATE_SETUP  *****");
+//        counter.incrementAndGet();
+//        logger.debug("counter is {}", counter.get());
+//        logger.debug("jvm_os_groupID : {}", jvm_os_groupID);
+//        logger.debug("jvm_gc_groupID : {}", jvm_gc_groupID);
+//        logger.debug("jvm_runtime_groupID : {}", jvm_runtime_groupID);
+//        logger.debug("jvm_class_groupID : {}", jvm_class_groupID);
+//        logger.debug("jvm_thread_groupID : {}", jvm_thread_groupID);
+//        logger.debug("heap_metric_groupID : {}", heap_metric_groupID);
+//        logger.debug("nonheap_metric_groupID : {}", nonheap_metric_groupID );
+//        logger.debug("tomcat_thread_pool_groupID : {}",tomcat_thread_pool_groupID);
+//        logger.debug("tomcat_grp_groupID : {}",tomcat_grp_groupID);
+//        logger.debug("tomcat_servlet_groupID : {}", tomcat_servlet_groupID );
+//        logger.debug("tomcat_manager_groupID : {}",tomcat_manager_groupID );
+//        logger.debug("tomcat_db_groupID  : {}", tomcat_db_groupID);
+//        logger.debug("jmxtrans_metric_groupID : {}", jmxtrans_metric_groupID);
+//        logger.debug("app_groupID : {}", app_groupID );
+//        logger.debug("app_sales_groupID : {}", app_sales_groupID );
+//        logger.debug("cassandra_groupID : {}", cassandra_groupID );
+        if (cassandra_groupID == null) {
+            throw new ValidationException("CopperEgg Cassandra custom metrics identifier cannot be null.", query);
+        }
 //        throw new UnsupportedOperationException("validateSetup() method hasn't been implemented.");
 
     }
@@ -667,16 +628,18 @@ public class CopperEggWriter extends BaseOutputWriter {
 
     private void printResults(List<Result> results) {
         for (Result result : results) {
-            logger.warn("result.name : {}", result.getAttributeName());
+            logger.debug("result.name : {}", result.getAttributeName());
             printMap(result.getValues());
 //            logger.warn("result.name : {} and value : {}", result.getAttributeName(), result.getValues().get(result.getAttributeName()));
         }
     }
 
     public void send_metrics(String mg_name, List<Result> counters) {
-        logger.error("******************  SEND METRICS  ********************");
-        logger.warn("mg_name : {}", mg_name);
-        printResults(counters);
+//        logger.debug("******************  SEND METRICS  ********************");
+//        logger.debug("mg_name : {}", mg_name);
+        if (logger.isDebugEnabled()) {
+//            printResults(counters);
+        }
         long timeblock = counters.get(0).getEpoch()/1000;
         String identifier = counters.get(0).getTypeName();
         int remaining = counters.size();
@@ -704,7 +667,7 @@ public class CopperEggWriter extends BaseOutputWriter {
         URL newurl = null;
         try {
             newurl = new URL(url_str + "/samples/" + mg_name + ".json");
-            logger.error("URL is {" + newurl + "}");
+//            logger.debug("URL is {" + newurl + "}");
             if (proxy == null) {
                 urlCxn = (HttpURLConnection) newurl.openConnection();
             } else {
@@ -727,15 +690,15 @@ public class CopperEggWriter extends BaseOutputWriter {
             try {
                 cue_serialize(counters, urlCxn.getOutputStream());
                 int responseCode = urlCxn.getResponseCode();
-                logger.error("&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&   REsponce Code is {}", responseCode);
+//                logger.debug("&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&   REsponce Code is {}", responseCode);
                 if (responseCode != 200) {
                     logger.warn("one_set: Failure " + String.valueOf(responseCode) + ": " + urlCxn.getResponseMessage() + " to send result to CopperEgg service {}", newurl);
 //                    logger.warn("one_set: Failure {}: {} to send result to CopperEgg service {}");
                 }
                 try {
                     InputStream in = urlCxn.getInputStream();
-                    logger.warn("$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$");
-                    logger.warn(urlCxn.getResponseMessage());
+//                    logger.debug("$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$");
+//                    logger.debug(urlCxn.getResponseMessage());
                     IoUtils2.copy(in, IoUtils2.nullOutputStream());
                     IoUtils2.closeQuietly(in);
                     InputStream err = urlCxn.getErrorStream();
@@ -775,7 +738,7 @@ public class CopperEggWriter extends BaseOutputWriter {
                 g.writeObjectFieldStart("values");
             }
             for (Map.Entry<String, Object> entry : counter.getValues().entrySet()) {
-                logger.warn("Class of value is: {}", entry.getValue().getClass());
+//                logger.debug("Class of value is: {}", entry.getValue().getClass());
 //                String key = entry.getKey().toLowerCase();
                 String key = entry.getKey();
                 if (entry.getValue() instanceof Integer) {
@@ -789,14 +752,13 @@ public class CopperEggWriter extends BaseOutputWriter {
                 }
             }
         }
-        logger.error("^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^");
-//        logger.error(g.toString());
+//        logger.debug("^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^");
         g.writeEndObject();
         g.writeEndObject();
         g.flush();
         g.close();
 
-        logger.error(out.toString());
+        logger.debug(out.toString());
     }
 
     private static long getPID() {
@@ -827,7 +789,6 @@ public class CopperEggWriter extends BaseOutputWriter {
 
 
     private void read_config(String in) throws IOException {
-        logger.error("****************************************  READ_CONFIG STRING  *************************************");
         JsonFactory f = new MappingJsonFactory();
         JsonParser jp = f.createJsonParser(in);
 
@@ -837,10 +798,6 @@ public class CopperEggWriter extends BaseOutputWriter {
 
 
     public void read_config(InputStream in) throws IOException {
-
-        logger.error("****************************************  READ_CONFIG  *************************************");
-
-
         JsonFactory f = new MappingJsonFactory();
         JsonParser jp = f.createJsonParser(in);
 
@@ -857,10 +814,8 @@ public class CopperEggWriter extends BaseOutputWriter {
             return;
         }
         current = jp.nextToken();
-        logger.error(current.toString());
         String fieldName = jp.getCurrentName();
         current = jp.nextToken();
-        logger.error(current.toString());
 
         if (fieldName.equals("config")) {
             if (current != JsonToken.START_OBJECT) {
@@ -868,9 +823,7 @@ public class CopperEggWriter extends BaseOutputWriter {
                 return;
             }
             current = jp.nextToken();
-            logger.error(current.toString());
             String fieldName2 = jp.getCurrentName();
-            logger.error("FieldName2 : {}", fieldName2);
             if (fieldName2.equals("metric_groups")) {
                 current = jp.nextToken();
                 if (current != JsonToken.START_ARRAY) {
@@ -888,14 +841,12 @@ public class CopperEggWriter extends BaseOutputWriter {
                     JsonNode node1 = jp.readValueAsTree();
                     String node1string = write_tostring(node1);
                     metricgroupMap.put(node1.get("name").getTextValue(),node1string);
-                    logger.warn("MetricGroupMap added name {} and value {}", node1.get("name").getTextValue(), node1string);
+//                    logger.debug("MetricGroupMap added name {} and value {}", node1.get("name").getTextValue(), node1string);
                     current = jp.nextToken();
                 }
 
                 current = jp.nextToken();
                 String fieldName3 = jp.getCurrentName();
-                logger.error(current.toString());
-                logger.error("fieldName3 : {}", fieldName3);
 
                 if (fieldName3.equals("dashboards")) {
                     current = jp.nextToken();
@@ -904,18 +855,16 @@ public class CopperEggWriter extends BaseOutputWriter {
                         return;
                     }
                     current = jp.nextToken();
-                    logger.error(current.toString());
                     while (current != JsonToken.END_ARRAY) {
                         if (current != JsonToken.START_OBJECT) {
                             logger.warn("read_config: Error:  START_OBJECT not found after dashboards START_ARRAY : quiting.");
                             return;
                         }
                         current = jp.nextToken();
-                        logger.error(current.toString());
                         JsonNode node = jp.readValueAsTree();
                         String nodestring = write_tostring(node);
                         dashMap.put(node.get("name").getTextValue(),nodestring);
-                        logger.error("Putting on DASHMAP : {}, {}", node.get("name").getTextValue(),nodestring);
+//                        logger.debug("Putting on DASHMAP : {}, {}", node.get("name").getTextValue(), nodestring);
                         current = jp.nextToken();
 
                     }
@@ -960,7 +909,7 @@ public class CopperEggWriter extends BaseOutputWriter {
     }
 
     public void ensure_metric_groups() {
-        logger.error("****************************************  ENSURE_METRIC_GROUPS  *************************************");
+//        logger.debug("****************************************  ENSURE_METRIC_GROUPS  *************************************");
 
         HttpURLConnection urlConnection = null;
         OutputStreamWriter wr = null;
@@ -988,7 +937,7 @@ public class CopperEggWriter extends BaseOutputWriter {
                 try {
                     InputStream in = urlConnection.getInputStream();
                     String theString = convertStreamToString(in);
-                    logger.warn("TheString: {}", theString);
+//                    logger.debug("TheString: {}", theString);
                     for (Map.Entry<String, String> entry : metricgroupMap.entrySet()) {
                         String checkName =  entry.getKey();
                         try {
@@ -1003,9 +952,8 @@ public class CopperEggWriter extends BaseOutputWriter {
                             if(Rslt != null) {
                                 if (Rslt.toLowerCase().contains("cassandra")) {
                                     cassandra_groupID = Rslt;
-                                    logger.error("************ SET cassandra_groupID to {}", cassandra_groupID);
+//                                    logger.debug("************ SET cassandra_groupID to {}", cassandra_groupID);
                                 }
-/*
                                 if (Rslt.toLowerCase().contains("tomcat")) {
                                     if (Rslt.toLowerCase().contains("thread_pool")) {
                                         tomcat_thread_pool_groupID = Rslt;
@@ -1041,7 +989,6 @@ public class CopperEggWriter extends BaseOutputWriter {
                                 } else if (Rslt.toLowerCase().contains("heap")) {
                                     heap_metric_groupID = Rslt;
                                 }
-*/
                             }
                         } catch (Exception e) {
                             exceptionCounter.incrementAndGet();
@@ -1060,7 +1007,7 @@ public class CopperEggWriter extends BaseOutputWriter {
 
     private void printMap(Map<String, Object> map) {
         for (String s : map.keySet()) {
-            logger.warn("Key: {} and Value: {}", s, map.get(s));
+            logger.debug("Key: {} and Value: {}", s, map.get(s));
         }
     }
 
